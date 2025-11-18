@@ -1,33 +1,41 @@
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy import select, func
+
 from sqlalchemy.ext.asyncio import AsyncSession
-from schemas import MovieListResponseSchema, MovieDetailResponseSchema
+
 from database import get_db, MovieModel
 
+from schemas import MovieListResponseSchema, MovieDetailResponseSchema
 
-movie_router = APIRouter()
+router = APIRouter()
 
 
-@movie_router.get("/movies/", response_model=MovieListResponseSchema)
+@router.get("/movies/", response_model=MovieListResponseSchema)
 async def get_movies(
     request: Request,
     page: int = Query(1, ge=1),
     per_page: int = Query(10, ge=1, le=20),
-    db: AsyncSession = Depends,
+    db: AsyncSession = Depends(get_db),
 ):
+    # загальна кількість фільмів
     total_items_result = await db.execute(select(func.count(MovieModel.id)))
-    total_items = total_items_result.scalar()
+    total_items = total_items_result.scalar_one()
     if total_items == 0:
         raise HTTPException(status_code=404, detail="No movies found.")
 
+    # розрахунок сторінок
     total_pages = (total_items + per_page - 1) // per_page
     offset = (page - 1) * per_page
 
+    # вибірка фільмів з бази
     query = await db.execute(select(MovieModel).offset(offset).limit(per_page))
-
     movies = query.scalars().all()
 
+    if not movies:
+        raise HTTPException(status_code=404, detail="No movies found.")
+
+    # формуємо посилання на попередню і наступну сторінку
     prev_page = (
         f"/theater/movies/?page={page-1}&per_page={per_page}" if page > 1 else None
     )
@@ -46,13 +54,14 @@ async def get_movies(
     )
 
 
-@movie_router.get("/{movie_id}/", response_model=MovieDetailResponseSchema)
+@router.get("/{movie_id}/", response_model=MovieDetailResponseSchema)
 async def get_movie(movie_id: int, db: AsyncSession = Depends(get_db)):
     query = await db.execute(select(MovieModel).where(MovieModel.id == movie_id))
-    movie = query.scalar()
+    movie = query.scalar_one_or_none()
 
     if not movie:
         raise HTTPException(
             status_code=404, detail="Movie with the given ID was not found."
         )
+
     return movie

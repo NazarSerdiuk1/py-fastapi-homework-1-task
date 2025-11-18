@@ -1,30 +1,37 @@
-import datetime
-from typing import List, Optional
+
 from pydantic import BaseModel
 
+from typing import List, Optional
 
-class MovieDetailResponseSchema(BaseModel):
+
+class MovieSchema(BaseModel):
     id: int
     name: str
-    date: Optional[datetime.date]
-    score: Optional[int]
-    genre: Optional[str]
-    overview: Optional[str]
-    crew: Optional[str]
-    orig_title: Optional[str]
-    status: Optional[str]
-    orig_lang: Optional[str]
-    budget: Optional[int]
-    revenue: Optional[int]
-    country: Optional[str]
+    date: str
+    score: float
+    genre: str
+    overview: str
+    crew: str
+    orig_title: str
+    status: str
+    orig_lang: str
+    budget: int
+    revenue: int
+    country: str
 
     class Config:
-        orm_mode = True
+        orm_mode = (
+            True  
+        )
 
 
 class MovieListResponseSchema(BaseModel):
-    movies: List[MovieDetailResponseSchema]
+    movies: List[MovieSchema]
     prev_page: Optional[str]
     next_page: Optional[str]
     total_pages: int
     total_items: int
+
+
+class MovieDetailResponseSchema(MovieSchema):
+    pass
