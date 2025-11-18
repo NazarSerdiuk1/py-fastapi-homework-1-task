@@ -37,10 +37,10 @@ async def get_movies(
 
     # формуємо посилання на попередню і наступну сторінку
     prev_page = (
-        f"/theater/movies/?page={page-1}&per_page={per_page}" if page > 1 else None
+        f"/theater/movies/?page={page - 1}&per_page={per_page}" if page > 1 else None
     )
     next_page = (
-        f"/theater/movies/?page={page+1}&per_page={per_page}"
+        f"/theater/movies/?page={page + 1}&per_page={per_page}"
         if page < total_pages
         else None
     )

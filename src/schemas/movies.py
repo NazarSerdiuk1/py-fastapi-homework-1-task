@@ -4,7 +4,8 @@ from pydantic import BaseModel
 from typing import List, Optional
 
 
-class MovieSchema(BaseModel):
+# Схема для одного фільму
+class MovieDetailResponseSchema(BaseModel):
     id: int
     name: str
     date: str
@@ -15,23 +16,18 @@ class MovieSchema(BaseModel):
     orig_title: str
     status: str
     orig_lang: str
-    budget: int
-    revenue: int
+    budget: Optional[int]
+    revenue: Optional[int]
     country: str
 
     class Config:
-        orm_mode = (
-            True  
-        )
+        orm_mode = True  # важливо для SQLAlchemy об'єктів
 
 
+# Схема для списку фільмів із пагінацією
 class MovieListResponseSchema(BaseModel):
-    movies: List[MovieSchema]
+    movies: List[MovieDetailResponseSchema]
     prev_page: Optional[str]
     next_page: Optional[str]
     total_pages: int
     total_items: int
-
-
-class MovieDetailResponseSchema(MovieSchema):
-    pass
