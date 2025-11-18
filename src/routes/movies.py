@@ -6,10 +6,10 @@ from schemas import MovieListResponseSchema, MovieDetailResponseSchema
 from database import get_db, MovieModel
 
 
-router = APIRouter()
+movie_router = APIRouter()
 
 
-@router.get("/movies/", response_model=MovieListResponseSchema)
+@movie_router.get("/movies/", response_model=MovieListResponseSchema)
 async def get_movies(
     request: Request,
     page: int = Query(1, ge=1),
@@ -46,7 +46,7 @@ async def get_movies(
     )
 
 
-@router.get("/{movie_id}/", response_model=MovieDetailResponseSchema)
+@movie_router.get("/{movie_id}/", response_model=MovieDetailResponseSchema)
 async def get_movie(movie_id: int, db: AsyncSession = Depends(get_db)):
     query = await db.execute(select(MovieModel).where(MovieModel.id == movie_id))
     movie = query.scalar()
