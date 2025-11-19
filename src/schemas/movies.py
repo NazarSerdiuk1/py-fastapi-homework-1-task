@@ -1,14 +1,11 @@
-
 from pydantic import BaseModel
-
 from typing import List, Optional
 
 
-# Схема для одного фільму
 class MovieDetailResponseSchema(BaseModel):
     id: int
     name: str
-    date: str
+    date: str  
     score: float
     genre: str
     overview: str
@@ -16,15 +13,14 @@ class MovieDetailResponseSchema(BaseModel):
     orig_title: str
     status: str
     orig_lang: str
-    budget: Optional[int]
-    revenue: Optional[int]
+    budget: float  
+    revenue: float  
     country: str
 
     class Config:
-        orm_mode = True  # важливо для SQLAlchemy об'єктів
+        orm_mode = True
 
 
-# Схема для списку фільмів із пагінацією
 class MovieListResponseSchema(BaseModel):
     movies: List[MovieDetailResponseSchema]
     prev_page: Optional[str]
